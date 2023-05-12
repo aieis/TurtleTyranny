@@ -56,3 +56,18 @@ Fixing the severe lack of important items for the turtles.
     versionRange="[1.16.5,1.17)"
     ordering="NONE"
     side="BOTH"
+
+[[dependencies.cctind]]
+modId = "computercraft"
+mandatory = true
+versionRange = "[1.101.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+
+[[dependencies.cctind]]
+modId = "tac"
+mandatory = true
+versionRange = "[0.0.1,)"
+ordering = "AFTER"
+side = "BOTH"
