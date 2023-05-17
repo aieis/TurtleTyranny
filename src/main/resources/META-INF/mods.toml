@@ -71,3 +71,11 @@ mandatory = true
 versionRange = "[0.0.1,)"
 ordering = "AFTER"
 side = "BOTH"
+
+
+[[dependencies.cctind]]
+modId = "immersiveengineering"
+mandatory = true
+versionRange = "[0.0.1,)"
+ordering = "AFTER"
+side = "BOTH"

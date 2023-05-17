@@ -84,7 +84,8 @@ dependencies {
 
     implementation (fg.deobf("cc.tweaked:cc-tweaked-1.16.5-1.101.2:api"))
     implementation (fg.deobf("cc.tweaked:cc-tweaked-1.16.5:1.101.2"))
-
+    //ImmersiveEngineering-1.16.5-5.1.0-148.jar
+    implementation (fg.deobf("ie:ImmersiveEngineering-1.16.5-5.1.0:148"))
 //    runtimeOnly("tac.obf:obfuscate-0.6.3:1.16.5")
 //    runtimeOnly("tac:curios-forge-1.16.5:4.1.0.0")
 
