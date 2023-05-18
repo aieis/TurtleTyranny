@@ -76,12 +76,19 @@ class LiveLogger
 {
     public static void live_log(String str)
     {
+        if (Minecraft.getInstance().player == null) {
+            return;
+        }
         PlayerEntity pe = Minecraft.getInstance().player;
         pe.displayClientMessage((new TranslationTextComponent(str)).withStyle(TextFormatting.GREEN), true);
     }
 }
 
 public class ArmedTurtle {
+    public static void live_log(String str)
+    {
+        LiveLogger.live_log(str);
+    }
     public static final DeferredRegister<EntityType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.ENTITIES, mod_id);
 
     private static <T extends ProjectileEntity> RegistryObject<EntityType<T>> registerProjectile(String id, BiFunction<EntityType<T>, World, T> function)

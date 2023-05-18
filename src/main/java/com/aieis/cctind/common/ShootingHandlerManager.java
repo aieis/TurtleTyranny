@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.aieis.cctind.peripherals.ArmedTurtle.live_log;
+
 public class ShootingHandlerManager {
 
     private static ShootingHandlerManager instance;
@@ -49,7 +51,10 @@ public class ShootingHandlerManager {
         if (!ShootingPlayers.containsKey(player) && shooting) {
             ShootingHandlerGen shootingHandler = new ShootingHandlerGen(player);
             shootingHandler.setShooting(true);
+            shootingHandler.beginFire();
             ShootingPlayers.put(player, shootingHandler);
+        } else if (ShootingPlayers.containsKey(player)){
+            ShootingPlayers.get(player).setShooting(shooting);
         }
     }
 
@@ -79,7 +84,7 @@ public class ShootingHandlerManager {
             ArrayList<PlayerEntity> keys = new ArrayList<>();
             ShootingPlayers.forEach(((player, shootingHandlerGen) -> {
                 shootingHandlerGen.onHandleShooting();
-                if (shootingHandlerGen.isShooting())
+                if (!shootingHandlerGen.isShooting())
                     keys.add(player);
             }));
             keys.forEach(player -> {ShootingPlayers.remove(player);});
@@ -96,8 +101,9 @@ public class ShootingHandlerManager {
     @SubscribeEvent
     public void onPostClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
+            live_log("Post Client Tick 2: " + ShootingPlayers.size());
             ShootingPlayers.forEach(((player, shootingHandlerGen) -> {
-                shootingHandlerGen.onHandleShooting();
+                shootingHandlerGen.onPostClientTick();
             }));
         }
     }

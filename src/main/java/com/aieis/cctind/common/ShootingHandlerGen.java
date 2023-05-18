@@ -1,7 +1,6 @@
 package com.aieis.cctind.common;
 
 import com.tac.guns.Config;
-import com.tac.guns.client.handler.GunRenderingHandler;
 import com.tac.guns.client.render.animation.module.GunAnimationController;
 import com.tac.guns.common.Gun;
 import com.tac.guns.item.GunItem;
@@ -13,6 +12,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+import static com.aieis.cctind.peripherals.ArmedTurtle.live_log;
 
 /**
  * Author: Forked from MrCrayfish, continued by Timeless devs
@@ -67,7 +68,7 @@ public class  ShootingHandlerGen
 
                 if(!(heldItem.getTag().getInt("AmmoCount") > 0)) {
                     ServerPlayHandlerGen.EmptyMag(player);
-                    shooting = false;
+                    //shooting = false;
                 }
         }
     }
@@ -162,12 +163,12 @@ public class  ShootingHandlerGen
             ItemStack heldItem = player.getMainHandItem();
             if(!(heldItem.getItem() instanceof GunItem && (Gun.hasAmmo(heldItem) || player.isCreative())))
             {
-                this.shooting = false;
+                //this.shooting = false;
             }
         }
         else
         {
-            this.shooting = false;
+            //this.shooting = false;
         }
     }
 
@@ -180,14 +181,17 @@ public class  ShootingHandlerGen
 
     public void onPostClientTick()
     {
+        live_log("ShootingHandlerGen: tick");
         if(player != null)
         {   ItemStack heldItem = player.getMainHandItem();
             if(heldItem.getItem() instanceof TimelessGunItem)
             {
+                live_log("ShootingHandlerGen: tick main_hand");
                 if(heldItem.getTag() == null) {
                     heldItem.getOrCreateTag();
                     return;
                 }
+                live_log("ShootingHandlerGen: tick has_tag");
                 TimelessGunItem gunItem = (TimelessGunItem) heldItem.getItem();
                 if(heldItem.getTag().getInt("CurrentFireMode") == 3 && Config.CLIENT.controls.burstPress.get())
                 {
@@ -230,26 +234,22 @@ public class  ShootingHandlerGen
     }
 
     public void fire(PlayerEntity player, ItemStack heldItem) {
+        live_log("ShootingHandlerGen: fire");
         if (heldItem.getItem() instanceof GunItem) {
             if (Gun.hasAmmo(heldItem) || player.isCreative()) {
                 if (!player.isSpectator()) {
-                    player.setSprinting(false);
-                    if (GunRenderingHandler.get().sprintTransition != 0) {
-                        this.shooting = false;
-                    } else {
-                        if (shootTickGapLeft <= 0.0F) {
-                            GunItem gunItem = (GunItem)heldItem.getItem();
-                            Gun modifiedGun = gunItem.getModifiedGun(heldItem);
+                    if (shootTickGapLeft <= 0.0F) {
+                        GunItem gunItem = (GunItem)heldItem.getItem();
+                        Gun modifiedGun = gunItem.getModifiedGun(heldItem);
 
-                            float rpm = (float)modifiedGun.getGeneral().getRate();
-                            shootTickGapLeft += calcShootTickGap((int)rpm);
-                            shootMsGap = calcShootTickGap((int)rpm);
-                            ServerPlayHandlerGen.handleShoot(player, player.getViewYRot(1.0F), player.getViewXRot(1.0F), 0, 0);
-                            if ((Boolean)Config.CLIENT.controls.burstPress.get()) {
-                                --this.burstTracker;
-                            } else {
-                                ++this.burstTracker;
-                            }
+                        float rpm = (float)modifiedGun.getGeneral().getRate();
+                        shootTickGapLeft += calcShootTickGap((int)rpm);
+                        shootMsGap = calcShootTickGap((int)rpm);
+                        ServerPlayHandlerGen.handleShoot(player, player.getViewYRot(1.0F), player.getViewXRot(1.0F), 0, 0);
+                        if ((Boolean)Config.CLIENT.controls.burstPress.get()) {
+                            --this.burstTracker;
+                        } else {
+                            ++this.burstTracker;
                         }
                     }
                 }
