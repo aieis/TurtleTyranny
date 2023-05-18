@@ -1,1 +1,1 @@
-cp D:/projects/mc/cct_tnc/build/libs/cctind-1.0.jar %appdata%.minecraft/mods/cctind-1.0.jar
+cp D:/projects/mc/cct_tnc/build/libs/cctind-1.0.jar %appdata%/.minecraft/mods/cctind-1.0.jar

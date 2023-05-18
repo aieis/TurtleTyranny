@@ -4,6 +4,7 @@ import com.aieis.cctind.common.ShootingHandlerManager;
 import com.tac.guns.common.Gun;
 import com.tac.guns.item.GunItem;
 import com.tac.guns.util.GunEnchantmentHelper;
+import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.lua.MethodResult;
 import dan200.computercraft.api.peripheral.IPeripheral;
@@ -51,7 +52,7 @@ public class FirearmPeripheral implements IPeripheral {
 
 
     @LuaFunction
-    public final MethodResult pullTrigger(@Nonnull ITurtleAccess turtle)
+    public final MethodResult pullTrigger() throws LuaException
     {
         Direction dir = turtle.getDirection();
         if (item == null) {
@@ -105,7 +106,7 @@ public class FirearmPeripheral implements IPeripheral {
     }
 
     @LuaFunction
-    public final MethodResult releaseTrigger(@Nonnull ITurtleAccess turtle)
+    public final MethodResult releaseTrigger() throws LuaException
     {
         Direction dir = turtle.getDirection();
         World world = turtle.getWorld();

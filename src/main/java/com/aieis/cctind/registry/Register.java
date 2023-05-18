@@ -17,6 +17,10 @@ public class Register {
                 TurtleUpgradeType.PERIPHERAL, "test_equip", () -> ForgeRegistries.ITEMS.getValue(new ResourceLocation("tac", "glock_17"))));
 
     }
+
+    public static void registerTurtlePeripherals(){
+
+    }
     public static void registerTACExtras() {
         PacketHandlerExtra.init();
     }
