@@ -3,7 +3,6 @@ package com.aieis.cctind.peripherals;
 import com.aieis.cctind.common.ShootingHandlerManager;
 import com.tac.guns.common.Gun;
 import com.tac.guns.item.GunItem;
-import com.tac.guns.util.GunEnchantmentHelper;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.lua.MethodResult;
@@ -11,24 +10,17 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.shared.turtle.core.TurtleBrain;
 import dan200.computercraft.shared.turtle.core.TurtlePlayer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
-
-import static com.aieis.cctind.peripherals.ArmedTurtle.make_clock;
 
 public class FirearmPeripheral implements IPeripheral {
 
@@ -50,17 +42,30 @@ public class FirearmPeripheral implements IPeripheral {
         return "firearm";
     }
 
+    private int find_item() {
+        Item target_gun = item_prov.asItem();
+        String str = ForgeRegistries.ITEMS.getKey(target_gun).toString();
+        for (int i = 0; i < turtle.getInventory().getContainerSize(); i++){
+            ItemStack item = turtle.getInventory().getItem(i);
+            if ( str.equals(ForgeRegistries.ITEMS.getKey(item.getItem()).toString())) {
+                this.item = item;
+                return i;
+            }
+        }
+        return -1;
+    }
 
     @LuaFunction
     public final MethodResult pullTrigger() throws LuaException
     {
         Direction dir = turtle.getDirection();
-        if (item == null) {
-            item = new ItemStack(item_prov.asItem());
-            Gun ngun = make_clock();
-            CompoundNBT tag = ngun.serializeNBT();
-            Gun gun = ((GunItem) item.getItem()).getGun();
-            gun.deserializeNBT(tag);
+        if (item == null && find_item() == -1) {
+            return MethodResult.of(false);
+//            item = new ItemStack(item_prov.asItem());
+//            Gun ngun = make_clock();
+//            CompoundNBT tag = ngun.serializeNBT();
+//            Gun gun = ((GunItem) item.getItem()).getGun();
+//            gun.deserializeNBT(tag);
         }
 
         // Create a fake player, and orient it appropriately
@@ -80,27 +85,7 @@ public class FirearmPeripheral implements IPeripheral {
         Item addAmmo = ForgeRegistries.ITEMS.getValue(gun.getProjectile().getItem());
         turtlePlayer.loadInventory( stack );
         turtlePlayer.inventory.setItem(1, new ItemStack(addAmmo, 64));
-        if (!Gun.hasAmmo(stack)) {
-            ItemStack ammo = Gun.findAmmo(turtlePlayer, gun.getProjectile().getItem())[0];
-            if(!ammo.isEmpty())
-            {
-                CompoundNBT tag = stack.getTag();
-                int amount = Math.min(ammo.getCount(), gun.getReloads().getReloadAmount());
-                if (tag != null) {
-                    int maxAmmo = GunEnchantmentHelper.getAmmoCapacity(stack, gun);
-                    amount = Math.min(amount, maxAmmo - tag.getInt("AmmoCount"));
-                    tag.putInt("AmmoCount", tag.getInt("AmmoCount") + amount);
-                }
-            }
 
-            PlayerEntity pe = Minecraft.getInstance().player;
-            pe.displayClientMessage((new TranslationTextComponent("Reloading")).withStyle(TextFormatting.GREEN), true);
-        } else {
-            PlayerEntity pe = Minecraft.getInstance().player;
-            pe.displayClientMessage((new TranslationTextComponent("Already loaded")).withStyle(TextFormatting.GREEN), true);
-        }
-
-        stack.getTag().putInt("CurrentFireMode", 1);
         ShootingHandlerManager.setShooting(turtlePlayer, true);
         return MethodResult.of(true);
     }

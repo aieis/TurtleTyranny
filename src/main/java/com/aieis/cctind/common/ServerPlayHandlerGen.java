@@ -168,7 +168,7 @@ public class ServerPlayHandlerGen {
 
     }
 
-    public static void handleUnload(ServerPlayerEntity player) {
+    public static void handleUnload(PlayerEntity player) {
         ItemStack stack = player.getMainHandItem();
         if (stack.getItem() instanceof GunItem) {
             CompoundNBT tag = stack.getTag();
@@ -278,6 +278,8 @@ public class ServerPlayHandlerGen {
                     return (ServerPlayerEntity) player;
                 }), messageSound);
             }
+
+            handleUnload(player);
         }
 
     }

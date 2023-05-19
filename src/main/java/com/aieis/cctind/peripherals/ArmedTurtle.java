@@ -22,7 +22,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -41,7 +40,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.minecraftforge.registries.DeferredRegister;
@@ -49,7 +47,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import static com.aieis.cctind.CCTInd.mod_id;
@@ -90,20 +87,6 @@ public class ArmedTurtle {
         LiveLogger.live_log(str);
     }
     public static final DeferredRegister<EntityType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.ENTITIES, mod_id);
-
-    private static <T extends ProjectileEntity> RegistryObject<EntityType<T>> registerProjectile(String id, BiFunction<EntityType<T>, World, T> function)
-    {
-        EntityType<T> type = EntityType.Builder.of(function::apply, EntityClassification.MISC)
-                .sized(0.25F, 0.25F)
-                .setTrackingRange(0)
-                .noSummon()
-                .fireImmune()
-                .setShouldReceiveVelocityUpdates(false)
-                .setCustomClientFactory((spawnEntity, world) -> null)
-                .build(id);
-        return REGISTER.register(id, () -> type);
-    }
-
     public static Gun make_clock() {
         Gun gun = new Gun();
         Gun.Projectile projectile = gun.getProjectile();
@@ -162,8 +145,6 @@ public class ArmedTurtle {
 
         return gun;
     }
-    public static final RegistryObject<EntityType<ProjectileEntity>> PROJECTILE = registerProjectile("projectile", ProjectileEntity::new);
-
     private static final Predicate<LivingEntity> HOSTILE_ENTITIES = (entity) -> {
         return entity.getSoundSource() == SoundCategory.HOSTILE && !((List) Config.COMMON.aggroMobs.exemptEntities.get()).contains(entity.getType().getRegistryName().toString());
     };

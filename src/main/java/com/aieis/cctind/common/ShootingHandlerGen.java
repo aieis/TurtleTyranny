@@ -1,7 +1,6 @@
 package com.aieis.cctind.common;
 
 import com.tac.guns.Config;
-import com.tac.guns.client.render.animation.module.GunAnimationController;
 import com.tac.guns.common.Gun;
 import com.tac.guns.item.GunItem;
 import com.tac.guns.item.TransitionalTypes.TimelessGunItem;
@@ -35,6 +34,8 @@ public class  ShootingHandlerGen
         this.shootErr = shootErr;
     }
     private boolean shooting;
+    private boolean reloading;
+    private int reloadTicksRemaining = 0;
     private boolean shootErr;
     private boolean clickUp = false;
     public int burstTracker = 0;
@@ -142,13 +143,13 @@ public class  ShootingHandlerGen
     {
         if(player == null || !player.isAlive() || player.getMainHandItem().getItem() instanceof GunItem)
             return;
-        GunAnimationController controller = GunAnimationController.fromItem(Minecraft.getInstance().player.getMainHandItem().getItem());
-        if(controller == null)
-            return;
-        else if (controller.isAnimationRunning() && (shootMsGap < 0F && this.burstTracker != 0))
+//        GunAnimationController controller = GunAnimationController.fromItem(Minecraft.getInstance().player.getMainHandItem().getItem());
+//        if(controller == null)
+//            return;
+        else if ( /* controller.isAnimationRunning() && */(shootMsGap < 0F && this.burstTracker != 0))
         {
-            if(controller.isAnimationRunning(GunAnimationController.AnimationLabel.PUMP) || controller.isAnimationRunning(GunAnimationController.AnimationLabel.PULL_BOLT))
-                return;
+//            if(controller.isAnimationRunning(GunAnimationController.AnimationLabel.PUMP) || controller.isAnimationRunning(GunAnimationController.AnimationLabel.PULL_BOLT))
+//                return;
             if(Config.CLIENT.controls.burstPress.get())
                 this.burstTracker = 0;
             this.clickUp = true;
@@ -165,6 +166,12 @@ public class  ShootingHandlerGen
             {
                 //this.shooting = false;
             }
+
+            if (heldItem.getItem() instanceof GunItem && !Gun.hasAmmo(heldItem)) {
+                reloading = true;
+                Gun gun = ((GunItem) heldItem.getItem()).getModifiedGun(heldItem);
+                reloadTicksRemaining = gun.getReloads().getReloadMagTimer();
+            }
         }
         else
         {
@@ -179,11 +186,19 @@ public class  ShootingHandlerGen
                 this.burstCooldown -= 1;
     }
 
+    public void reload(ItemStack stack)
+    {
+        if (!ReloadTrackerGen.increaseAmmo(player, stack)) {
+            setShooting(false);
+        }
+    }
+
     public void onPostClientTick()
     {
         live_log("ShootingHandlerGen: tick");
         if(player != null)
         {   ItemStack heldItem = player.getMainHandItem();
+
             if(heldItem.getItem() instanceof TimelessGunItem)
             {
                 live_log("ShootingHandlerGen: tick main_hand");
@@ -191,6 +206,18 @@ public class  ShootingHandlerGen
                     heldItem.getOrCreateTag();
                     return;
                 }
+
+                if (reloading && reloadTicksRemaining > 1) {
+                    reloadTicksRemaining -= 1;
+                    return;
+                }
+
+                if (reloading) {
+                    reloading = false;
+                    reloadTicksRemaining = 0;
+                    reload(heldItem);
+                }
+
                 live_log("ShootingHandlerGen: tick has_tag");
                 TimelessGunItem gunItem = (TimelessGunItem) heldItem.getItem();
                 if(heldItem.getTag().getInt("CurrentFireMode") == 3 && Config.CLIENT.controls.burstPress.get())
@@ -202,7 +229,9 @@ public class  ShootingHandlerGen
                 else if( shooting )
                 {
                     Gun gun = ((TimelessGunItem) heldItem.getItem()).getModifiedGun(heldItem);
+                    live_log("ShootingHandlerGen: tick auto fire?" );
                     if (gun.getGeneral().isAuto() && heldItem.getTag().getInt("CurrentFireMode") == 2) {
+                        live_log("ShootingHandlerGen: tick auto fire!" );
                         fire(player, heldItem);
                         return;
                     }

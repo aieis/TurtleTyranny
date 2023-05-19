@@ -8,13 +8,21 @@ import dan200.computercraft.api.turtle.TurtleUpgradeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.registries.ForgeRegistries;
+
+import static com.tac.guns.init.ModItems.*;
+
 public class Register {
 
     public static void registerTurtleUpgrades(){
 
-        ComputerCraftAPI.registerTurtleUpgrade(new TurtleFirearm(new ResourceLocation( "minecraft", "test_equip" ),
-                TurtleUpgradeType.PERIPHERAL, "test_equip", () -> ForgeRegistries.ITEMS.getValue(new ResourceLocation("tac", "glock_17"))));
+        ComputerCraftAPI.registerTurtleUpgrade(new TurtleFirearm(new ResourceLocation( "cctind", "turtle_glock_17" ),
+                TurtleUpgradeType.PERIPHERAL, "pacifier_glock17", GLOCK_17::get));
+
+        ComputerCraftAPI.registerTurtleUpgrade(new TurtleFirearm(new ResourceLocation( "cctind", "turtle_m16a4" ),
+                TurtleUpgradeType.PERIPHERAL, "pacifier_m16a4", M16A4::get));
+
+        ComputerCraftAPI.registerTurtleUpgrade(new TurtleFirearm(new ResourceLocation( "cctind", "turtle_m4" ),
+                TurtleUpgradeType.PERIPHERAL, "pacifier_m4", M4::get));
 
     }
 
