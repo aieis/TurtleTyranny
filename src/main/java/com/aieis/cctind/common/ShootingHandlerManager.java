@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.aieis.cctind.peripherals.ArmedTurtle.live_log;
-
 public class ShootingHandlerManager {
 
     private static ShootingHandlerManager instance;
@@ -101,7 +99,6 @@ public class ShootingHandlerManager {
     @SubscribeEvent
     public void onPostClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
-            live_log("Post Client Tick 2: " + ShootingPlayers.size());
             ShootingPlayers.forEach(((player, shootingHandlerGen) -> {
                 shootingHandlerGen.onPostClientTick();
             }));

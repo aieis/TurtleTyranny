@@ -22,6 +22,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 
+import static com.aieis.cctind.common.ReloadTrackerGen.findAmmoInventory;
+
 public class FirearmPeripheral implements IPeripheral {
 
     private final ITurtleAccess turtle;
@@ -61,11 +63,6 @@ public class FirearmPeripheral implements IPeripheral {
         Direction dir = turtle.getDirection();
         if (item == null && find_item() == -1) {
             return MethodResult.of(false);
-//            item = new ItemStack(item_prov.asItem());
-//            Gun ngun = make_clock();
-//            CompoundNBT tag = ngun.serializeNBT();
-//            Gun gun = ((GunItem) item.getItem()).getGun();
-//            gun.deserializeNBT(tag);
         }
 
         // Create a fake player, and orient it appropriately
@@ -78,13 +75,16 @@ public class FirearmPeripheral implements IPeripheral {
         turtlePlayer.xOld = position.getX();
         turtlePlayer.yOld = position.getY();
         turtlePlayer.zOld = position.getZ();
-        ItemStack stack = item;//item.copy();
+        ItemStack stack = item;
         turtlePlayer.setItemInHand(Hand.MAIN_HAND, stack);
 
         Gun gun = ((GunItem) stack.getItem()).getModifiedGun(stack);
-        Item addAmmo = ForgeRegistries.ITEMS.getValue(gun.getProjectile().getItem());
+        ItemStack[] ammoStacks = findAmmoInventory(turtle.getInventory(), gun.getProjectile().getItem());
         turtlePlayer.loadInventory( stack );
-        turtlePlayer.inventory.setItem(1, new ItemStack(addAmmo, 64));
+
+        for (int i = 0; i < Math.min(ammoStacks.length, turtlePlayer.inventory.getContainerSize() - 1); i++) {
+            turtlePlayer.inventory.setItem(i + 1, ammoStacks[i]);
+        }
 
         ShootingHandlerManager.setShooting(turtlePlayer, true);
         return MethodResult.of(true);
