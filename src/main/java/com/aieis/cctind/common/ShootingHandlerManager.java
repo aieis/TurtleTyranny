@@ -40,14 +40,14 @@ public class ShootingHandlerManager {
             return false;
         }
     }
-    public static void setShooting(PlayerEntity player, boolean shooting) {
+    public static void setShooting(PlayerEntity player, Runnable updater, boolean shooting) {
         if (ShootingPlayers.containsKey(player) && !shooting) {
             ShootingPlayers.get(player).setShooting(false);
             ShootingPlayers.remove(player);
         }
 
         if (!ShootingPlayers.containsKey(player) && shooting) {
-            ShootingHandlerGen shootingHandler = new ShootingHandlerGen(player);
+            ShootingHandlerGen shootingHandler = new ShootingHandlerGen(player, updater);
             shootingHandler.setShooting(true);
             shootingHandler.beginFire();
             ShootingPlayers.put(player, shootingHandler);

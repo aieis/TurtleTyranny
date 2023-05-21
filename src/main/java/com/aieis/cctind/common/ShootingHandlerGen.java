@@ -20,6 +20,8 @@ public class ShootingHandlerGen {
     // TODO: Cleanup and document ShootingHandler fire code, what is important or able to be simplified.
     private PlayerEntity player;
 
+    private Runnable updatePosition;
+
     public boolean isShooting() {
         return shooting;
     }
@@ -40,9 +42,15 @@ public class ShootingHandlerGen {
     public int burstTracker = 0;
     private int burstCooldown = 0;
 
-    public ShootingHandlerGen(PlayerEntity player) {
+    public ShootingHandlerGen(PlayerEntity player, Runnable updatePosition) {
         this.player = player;
+        this.updatePosition = updatePosition;
         reset();
+    }
+
+    public void updatePlayerPosition()
+    {
+        updatePosition.run();
     }
 
     public void reset() {
@@ -241,6 +249,7 @@ public class ShootingHandlerGen {
         if (!(heldItem.getItem() instanceof GunItem) || !(Gun.hasAmmo(heldItem) || player.isCreative()) || player.isSpectator() || shootTickGapLeft > 0.0F) {
             return;
         }
+        updatePlayerPosition();
         GunItem gunItem = (GunItem) heldItem.getItem();
         Gun modifiedGun = gunItem.getModifiedGun(heldItem);
 

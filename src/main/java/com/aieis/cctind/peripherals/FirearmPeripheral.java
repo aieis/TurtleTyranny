@@ -60,7 +60,7 @@ public class FirearmPeripheral implements IPeripheral {
     @LuaFunction
     public final MethodResult pullTrigger() throws LuaException
     {
-        Direction dir = turtle.getDirection();
+
         if (item == null && find_item() == -1) {
             return MethodResult.of(false);
         }
@@ -68,10 +68,11 @@ public class FirearmPeripheral implements IPeripheral {
         // Create a fake player, and orient it appropriately
         World world = turtle.getWorld();
         BlockPos position = turtle.getPosition();
+        Direction direction = turtle.getDirection();
         TileEntity turtleTile = turtle instanceof TurtleBrain ? ((TurtleBrain) turtle).getOwner() : world.getBlockEntity( position );
         if( turtleTile == null ) return MethodResult.of(false);
 
-        final TurtlePlayer turtlePlayer = TurtlePlayer.getWithPosition( turtle, position, dir );
+        final TurtlePlayer turtlePlayer = TurtlePlayer.getWithPosition( turtle, position, direction );
         turtlePlayer.xOld = position.getX();
         turtlePlayer.yOld = position.getY();
         turtlePlayer.zOld = position.getZ();
@@ -86,7 +87,12 @@ public class FirearmPeripheral implements IPeripheral {
             turtlePlayer.inventory.setItem(i + 1, ammoStacks[i]);
         }
 
-        ShootingHandlerManager.setShooting(turtlePlayer, true);
+        ShootingHandlerManager.setShooting(turtlePlayer, () -> {
+            BlockPos pos = turtle.getPosition();
+            Direction dir = turtle.getDirection();
+            turtlePlayer.setPosition(turtle, pos, dir);
+            }, true);
+
         return MethodResult.of(true);
     }
 
@@ -99,7 +105,7 @@ public class FirearmPeripheral implements IPeripheral {
         TileEntity turtleTile = turtle instanceof TurtleBrain ? ((TurtleBrain) turtle).getOwner() : world.getBlockEntity( position );
         if( turtleTile == null ) return MethodResult.of(false);
         final TurtlePlayer turtlePlayer = TurtlePlayer.getWithPosition( turtle, position, dir );
-        ShootingHandlerManager.setShooting(turtlePlayer, false);
+        ShootingHandlerManager.setShooting(turtlePlayer, null, false);
         return MethodResult.of(true);
     }
     @Override
