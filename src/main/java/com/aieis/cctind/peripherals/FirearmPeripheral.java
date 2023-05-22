@@ -108,6 +108,11 @@ public class FirearmPeripheral implements IPeripheral {
         ShootingHandlerManager.setShooting(turtlePlayer, null, false);
         return MethodResult.of(true);
     }
+
+    @LuaFunction MethodResult setDirection(double x, double y, double z) throws LuaException
+    {
+        throw new LuaException("Not implemented!");
+    }
     @Override
     public boolean equals( IPeripheral other )
     {
