@@ -17,6 +17,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -30,6 +31,10 @@ public class FirearmPeripheral implements IPeripheral {
 
     protected final IItemProvider item_prov;
     protected ItemStack item = null;
+
+
+    /* TODO: Consider using yaw*/
+    private Vector3d rotation;
 
     public FirearmPeripheral( ITurtleAccess turtle, IItemProvider item_prov )
     {
@@ -88,6 +93,7 @@ public class FirearmPeripheral implements IPeripheral {
         }
 
         ShootingHandlerManager.setShooting(turtlePlayer, () -> {
+            turtlePlayer.get
             BlockPos pos = turtle.getPosition();
             Direction dir = turtle.getDirection();
             turtlePlayer.setPosition(turtle, pos, dir);
@@ -111,7 +117,12 @@ public class FirearmPeripheral implements IPeripheral {
 
     @LuaFunction MethodResult setDirection(double x, double y, double z) throws LuaException
     {
-        throw new LuaException("Not implemented!");
+        rotation = new Vector3d(x, y, z);
+        return MethodResult.of(true);
+    }
+
+    public Vector3d getRotation() {
+        return rotation;
     }
     @Override
     public boolean equals( IPeripheral other )
