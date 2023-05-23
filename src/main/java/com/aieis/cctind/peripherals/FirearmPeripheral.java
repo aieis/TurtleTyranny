@@ -17,7 +17,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -33,7 +32,6 @@ public class FirearmPeripheral implements IPeripheral {
     protected ItemStack item = null;
 
 
-    /* TODO: Consider using yaw*/
     private float xRot;
     private float yRot;
 
