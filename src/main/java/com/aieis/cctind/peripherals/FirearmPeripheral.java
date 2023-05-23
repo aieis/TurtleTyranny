@@ -34,7 +34,8 @@ public class FirearmPeripheral implements IPeripheral {
 
 
     /* TODO: Consider using yaw*/
-    private Vector3d rotation;
+    private float xRot;
+    private float yRot;
 
     public FirearmPeripheral( ITurtleAccess turtle, IItemProvider item_prov )
     {
@@ -93,10 +94,11 @@ public class FirearmPeripheral implements IPeripheral {
         }
 
         ShootingHandlerManager.setShooting(turtlePlayer, () -> {
-            turtlePlayer.get
             BlockPos pos = turtle.getPosition();
             Direction dir = turtle.getDirection();
             turtlePlayer.setPosition(turtle, pos, dir);
+            turtlePlayer.xRot = xRot;
+            turtlePlayer.yRot = yRot;
             }, true);
 
         return MethodResult.of(true);
@@ -115,15 +117,13 @@ public class FirearmPeripheral implements IPeripheral {
         return MethodResult.of(true);
     }
 
-    @LuaFunction MethodResult setDirection(double x, double y, double z) throws LuaException
+    @LuaFunction MethodResult setRotation(float x, float y) throws LuaException
     {
-        rotation = new Vector3d(x, y, z);
+        xRot = x;
+        yRot = y;
         return MethodResult.of(true);
     }
 
-    public Vector3d getRotation() {
-        return rotation;
-    }
     @Override
     public boolean equals( IPeripheral other )
     {
