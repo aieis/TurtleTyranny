@@ -10,6 +10,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.shared.turtle.core.TurtleBrain;
 import dan200.computercraft.shared.turtle.core.TurtlePlayer;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -17,12 +18,16 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 import static com.aieis.cctind.common.ReloadTrackerGen.findAmmoInventory;
+import static com.aieis.cctind.peripherals.ArmedTurtle.live_log;
 
 public class FirearmPeripheral implements IPeripheral {
 
@@ -59,6 +64,46 @@ public class FirearmPeripheral implements IPeripheral {
             }
         }
         return -1;
+    }
+
+    private TurtlePlayer get_player()
+    {
+        BlockPos position = turtle.getPosition();
+        Direction direction = turtle.getDirection();
+        final TurtlePlayer turtlePlayer = TurtlePlayer.getWithPosition( turtle, position, direction );
+        turtlePlayer.xOld = position.getX();
+        turtlePlayer.yOld = position.getY();
+        turtlePlayer.zOld = position.getZ();
+        return turtlePlayer;
+    }
+
+    @LuaFunction
+    public final MethodResult findTargets()
+    {
+
+        Direction direction = turtle.getDirection();
+        Vector3i normal = direction.getNormal();
+        Vector3d vec = new Vector3d(normal.getX(), normal.getY(), normal.getZ()).scale(30);
+        TurtlePlayer player = get_player();
+        World world = turtle.getWorld();
+
+        List<Entity> entities = player.level.getEntities(player, player.getBoundingBox().inflate(50.0), (input) -> {
+            return true;
+        });
+
+        //List<LivingEntity> entities = world.getNearbyEntities(CowEntity.class, EntityPredicate.DEFAULT.allowInvulnerable().allowUnseeable().allowNonAttackable().allowSameTeam(), player, player.getBoundingBox().inflate(20, 0, 20));
+        live_log("Pos: " + player.getX() + " " + player.getZ());
+
+        Vector3d[] entity_locations = new Vector3d[entities.size()];
+        for (int i = 0; i < entities.size(); i++) {
+            double x = entities.get(i).getX();
+            double y = entities.get(i).getY();
+            double z = entities.get(i).getZ();
+
+            entity_locations[i] = new Vector3d(x, y, z);
+            //live_log("Entities: " + x + " " + y + " " + z);
+        }
+        return MethodResult.of(entities.size());
     }
 
     @LuaFunction

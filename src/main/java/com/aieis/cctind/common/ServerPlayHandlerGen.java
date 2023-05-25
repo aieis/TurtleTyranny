@@ -75,6 +75,7 @@ public class ServerPlayHandlerGen {
     public ServerPlayHandlerGen() {
     }
 
+
     public static void handleShoot(PlayerEntity player, float yRot, float xRot, float randP, float randY) {
         if (!player.isSpectator()) {
             World world = player.level;
